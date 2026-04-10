@@ -1,55 +1,125 @@
 #include <iostream>
-#include <cstdlib>
+#include <fstream>
 using namespace std;
 
-/*
-    Cajero automatico.
-*/
 
+// ========== CONFIG ==========
+const int PIN_CORRECTO = 1234;
+const string ARCHIVO = "saldo.txt";
+
+// ========== FUNCIONES ==========
+void guardarSaldo(double saldo) {
+    ofstream archivo(ARCHIVO);
+    archivo << saldo;
+}
+
+double cargarSaldo() {
+    ifstream archivo(ARCHIVO);
+    double saldo;
+
+    if (archivo >> saldo) {
+        return saldo;
+    } else {
+        return 1000; // Saldo Inicial (con el que iniciamos, puede ser cambiado a cualquier saldo que se desee).
+    }
+}
+
+bool login() {
+    int pin, intentos = 3;
+
+    while (intentos > 0) {
+        cout << "Ingrese su PIN: ";
+        cin >> pin;
+
+        if (pin == PIN_CORRECTO) {
+            cout << "Acceso concedido.\n";
+            return true;
+        } else {
+            intentos--;
+            cout << "PIN incorrecto. Intentos restantes: " << intentos << endl;
+        }
+    }
+
+    cout << "Cuenta bloqueada.\n";
+    return false;
+}
+
+void menu() {
+    cout << "\n--- CAJERO AUTOMATICO ---\n";
+    cout << "1. Consultar saldo\n";
+    cout << "2. Depositar dinero\n";
+    cout << "3. Retirar dinero\n";
+    cout << "4. Salir\n";
+    cout << "Seleccione una opcion: ";
+}
+
+void consultar(double saldo) {
+    cout << "Saldo actual: $" << saldo << endl;
+}
+
+double depositar(double saldo) {
+    double cantidad;
+    cout << "Cantidad a depositar: ";
+    cin >> cantidad;
+
+    if (cantidad <= 0) {
+        cout << "Cantidad invalida.\n";
+    } else {
+        saldo += cantidad;
+        cout << "Deposito exitoso.\n";
+    }
+
+    return saldo;
+}
+
+double retirar(double saldo) {
+    double cantidad;
+    cout << "Cantidad a retirar: ";
+    cin >> cantidad;
+
+    if (cantidad <= 0) {
+        cout << "Cantidad invalida.\n";
+    } else if (cantidad > saldo) {
+        cout << "Fondos insuficientes.\n";
+    } else {
+        saldo -= cantidad;
+        cout << "Retiro exitoso.\n";
+    }
+
+    return saldo;
+}
+
+// ========== MAIN ==========
 int main() {
-    system("cls");
-    
+    if (!login()) return 0;
+
+    double saldo = cargarSaldo();
     int opcion;
-    double saldo = 1000, cantidad;
 
     do {
-        cout << "====== CAJERO AUTOMATICO ======" << endl;
-        cout << "1. Consultar saldo" << endl;
-        cout << "2. Depositar dinero" << endl;
-        cout << "3. Retirar dinero" << endl;
-        cout << "4. Salir" << endl;
-        cout << "Seleccione una opcion: ";
+        menu();
         cin >> opcion;
 
-        switch(opcion) {
+        switch (opcion) {
             case 1:
-                cout << "Tu saldo es: $" << saldo << endl;
+                consultar(saldo);
                 break;
             case 2:
-                cout << "Cantidad a depositar: ";
-                cin >> cantidad;
-                saldo += cantidad;
-                cout << "Deposito exitoso." << endl;
+                saldo = depositar(saldo);
+                guardarSaldo(saldo);
                 break;
             case 3:
-                cout << "Cantidad a retirar: ";
-                cin >> cantidad;
-                if (cantidad > saldo) {
-                    cout << "Fondos insuficientes." << endl;
-                }
-                else {
-                    saldo -= cantidad;
-                    cout << "Retiro exitoso." << endl;
-                }
+                saldo = retirar(saldo);
+                guardarSaldo(saldo);
                 break;
             case 4:
-                cout << "Has salido con exito de tu banco." << endl;
+                cout << "Gracias por usar el cajero.\n";
                 break;
             default:
-                cout << "Opcion invalida." << endl;
+                cout << "Opcion invalida.\n";
         }
 
-    }while (opcion != 4); 
+    } while (opcion != 4);
 
     return 0;
 }
