@@ -2,12 +2,9 @@
 #include <fstream>
 using namespace std;
 
-
-// ========== CONFIG ==========
 const int PIN_CORRECTO = 1234;
 const string ARCHIVO = "saldo.txt";
 
-// ========== FUNCIONES ==========
 void guardarSaldo(double saldo) {
     ofstream archivo(ARCHIVO);
     archivo << saldo;
@@ -89,7 +86,6 @@ double retirar(double saldo) {
     return saldo;
 }
 
-// ========== MAIN ==========
 int main() {
     if (!login()) return 0;
 
